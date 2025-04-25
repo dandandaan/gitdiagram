@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GitDiagram API Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    .form { margin-bottom: 20px; }
+    input, button { padding: 8px; margin: 5px 0; }
+    #diagram { border: 1px solid #ccc; padding: 10px; margin-top: 20px; }
+    pre { white-space: pre-wrap; }
+    .api-key-section { 
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .api-key-status {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .status-set {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-not-set {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .toggle-section {
+      cursor: pointer;
+      color: #0066cc;
+      margin-bottom: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>GitDiagram API Test</h1>
+  
+  <div class="form">
+    <input id="username" placeholder="GitHub ユーザー名" />
+    <input id="repo" placeholder="リポジトリ名" />
+    <input id="instructions" placeholder="任意の指示" />
+    <button onclick="generateDiagram()">ダイアグラム生成</button>
+  </div>
+  
+  <div class="toggle-section" onclick="toggleApiKeySection()">
+    <span id="toggle-text">▶ OpenAI APIキー設定（大きなリポジトリ用）</span>
+  </div>
+  
+  <div id="api-key-section" class="api-key-section hidden">
+    <h3>OpenAI APIキー設定</h3>
+    <p>大きなリポジトリ（50,000トークン以上）を分析するには、自分のOpenAI APIキーが必要です。</p>
+    <div class="form">
+      <input id="api-key" type="password" placeholder="OpenAI APIキー" />
+      <button onclick="saveApiKey()">APIキーを保存</button>
+      <span id="api-key-status" class="api-key-status status-not-set">未設定</span>
+    </div>
+    <p><small>※APIキーはブラウザのローカルストレージに保存され、サーバーには送信時のみ使用されます。</small></p>
+  </div>
+  
+  <div id="status"></div>
+  <div id="explanation"></div>
+  <div id="diagram"></div>
+  
+  <div id="debug" class="hidden">
+    <h3>デバッグ情報</h3>
+    <pre id="debug-content"></pre>
+  </div>
+  
+  <script>
+    mermaid.initialize({ startOnLoad: false });
+    
+    // ページ読み込み時にAPIキーの状態を確認
+    document.addEventListener('DOMContentLoaded', function() {
+      checkApiKeyStatus();
+    });
+    
+    // APIキーセクションの表示/非表示を切り替える
+    function toggleApiKeySection() {
+      const section = document.getElementById('api-key-section');
+      const toggleText = document.getElementById('toggle-text');
+      
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        toggleText.textContent = '▼ OpenAI APIキー設定（大きなリポジトリ用）';
+      } else {
+        section.classList.add('hidden');
+        toggleText.textContent = '▶ OpenAI APIキー設定（大きなリポジトリ用）';
+      }
+    }
+    
+    // APIキーの状態を確認
+    function checkApiKeyStatus() {
+      const apiKey = localStorage.getItem('openai_key');
+      const statusEl = document.getElementById('api-key-status');
+      
+      if (apiKey) {
+        statusEl.textContent = '設定済み';
+        statusEl.className = 'api-key-status status-set';
+      } else {
+        statusEl.textContent = '未設定';
+        statusEl.className = 'api-key-status status-not-set';
+      }
+    }
+    
+    // APIキーを保存
+    function saveApiKey() {
+      const apiKey = document.getElementById('api-key').value;
+      
+      if (apiKey) {
+        localStorage.setItem('openai_key', apiKey);
+        document.getElementById('api-key').value = '';
+        alert('APIキーが保存されました');
+      } else {
+        alert('APIキーを入力してください');
+      }
+      
+      checkApiKeyStatus();
+    }
+    
+    async function generateDiagram() {
+      const username = document.getElementById('username').value;
+      const repo = document.getElementById('repo').value;
+      const instructions = document.getElementById('instructions').value;
+      const statusEl = document.getElementById('status');
+      const explanationEl = document.getElementById('explanation');
+      const diagramEl = document.getElementById('diagram');
+      const debugEl = document.getElementById('debug-content');
+      
+      // GitHubのURLからユーザー名とリポジトリ名を抽出
+      if (username.includes('github.com')) {
+        try {
+          const url = new URL(username);
+          const parts = url.pathname.split('/').filter(p => p);
+          if (parts.length >= 2) {
+            document.getElementById('username').value = parts[0];
+            document.getElementById('repo').value = parts[1];
+          }
+        } catch (e) {
+          console.error('Invalid URL:', e);
+        }
+      }
+      
+      const extractedUsername = document.getElementById('username').value;
+      const extractedRepo = document.getElementById('repo').value;
+      
+      if (!extractedUsername || !extractedRepo) {
+        statusEl.textContent = 'ユーザー名とリポジトリ名を入力してください';
+        return;
+      }
+      
+      statusEl.textContent = '生成中...';
+      explanationEl.textContent = '';
+      diagramEl.innerHTML = '';
+      debugEl.textContent = '';
+      
+      // APIキーを取得
+      const apiKey = localStorage.getItem('openai_key');
+      
+      try {
+        const requestBody = { 
+          username: extractedUsername, 
+          repo: extractedRepo, 
+          instructions: instructions 
+        };
+        
+        // APIキーが設定されている場合は追加
+        if (apiKey) {
+          requestBody.api_key = apiKey;
+        }
+        
+        const response = await fetch('http://localhost:8000/generate/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        let diagram = '';
+        let explanation = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = new TextDecoder().decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                // 完全なJSONを抽出するための正規表現
+                const jsonMatch = line.slice(6).match(/^\s*(\{.*\})\s*$/);
+                if (jsonMatch) {
+                  const data = JSON.parse(jsonMatch[1]);
+                  console.log('Received data:', data);
+                  
+                  if (data.error) {
+                    statusEl.textContent = `エラー: ${data.error}`;
+                    
+                    // トークン制限エラーの場合、APIキーセクションを表示
+                    if (data.error.includes('token limit') || data.error.includes('API key')) {
+                      document.getElementById('api-key-section').classList.remove('hidden');
+                      document.getElementById('toggle-text').textContent = '▼ OpenAI APIキー設定（大きなリポジトリ用）';
+                    }
+                    
+                    return;
+                  }
+                  
+                  if (data.status === 'diagram_chunk' && data.chunk) {
+                    diagram += data.chunk;
+                    statusEl.textContent = 'ダイアグラム生成中...';
+                    
+                    // デバッグ情報を表示
+                    debugEl.textContent = 'ダイアグラムデータ受信中: ' + 
+                      diagram.substring(0, 100) + '...';
+                  }
+                  
+                  if (data.status === 'explanation_chunk' && data.chunk) {
+                    explanation += data.chunk;
+                    explanationEl.textContent = explanation;
+                  }
+                  
+                  if (data.status === 'complete') {
+                    statusEl.textContent = '完了！';
+                    diagram = data.diagram || diagram;
+                    explanation = data.explanation || explanation;
+                    explanationEl.textContent = explanation;
+                    renderDiagram(diagram);
+                  }
+                } else {
+                  // 完全なJSONでない場合、特殊なケースを処理
+                  const rawData = line.slice(6);
+                  
+                  // "complete"ステータスを含むかチェック
+                  if (rawData.includes('"status": "complete"') && rawData.includes('"diagram"')) {
+                    // デバッグ表示
+                    document.getElementById('debug').classList.remove('hidden');
+                    debugEl.textContent = '完全なJSONではないデータを処理中...';
+                    
+                    // ダイアグラム部分を抽出する試み
+                    const diagramMatch = rawData.match(/"diagram":\s*"(.*?)(?:"|$)/);
+                    if (diagramMatch && diagramMatch[1]) {
+                      // エスケープされた文字を処理
+                      diagram = diagramMatch[1]
+                        .replace(/\\n/g, '\n')
+                        .replace(/\\"/g, '"')
+                        .replace(/\\\\/g, '\\');
+                      
+                      statusEl.textContent = '完了！（部分的なデータから復元）';
+                      renderDiagram(diagram);
+                    }
+                    
+                    // 説明部分を抽出する試み
+                    const explanationMatch = rawData.match(/"explanation":\s*"(.*?)(?:"|$)/);
+                    if (explanationMatch && explanationMatch[1]) {
+                      explanation = explanationMatch[1]
+                        .replace(/\\n/g, '\n')
+                        .replace(/\\"/g, '"')
+                        .replace(/\\\\/g, '\\');
+                      
+                      explanationEl.textContent = explanation;
+                    }
+                  }
+                }
+              } catch (e) {
+                console.error('Error parsing SSE message:', e, line);
+                
+                // エラー時にデバッグ情報を表示
+                document.getElementById('debug').classList.remove('hidden');
+                debugEl.textContent = 'JSONパースエラー: ' + e.message + '\n\n';
+                
+                // エラーが発生した場合でも、データの一部を抽出して表示を試みる
+                const rawData = line.slice(6);
+                
+                // ダイアグラムデータの抽出を試みる
+                if (rawData.includes('"diagram"')) {
+                  const diagramStart = rawData.indexOf('"diagram": "') + 12;
+                  if (diagramStart > 12) {
+                    let extractedDiagram = '';
+                    let i = diagramStart;
+                    let escapeNext = false;
+                    
+                    while (i < rawData.length) {
+                      const char = rawData[i];
+                      if (char === '\\' && !escapeNext) {
+                        escapeNext = true;
+                      } else if (char === '"' && !escapeNext) {
+                        break;
+                      } else {
+                        if (char === 'n' && escapeNext) {
+                          extractedDiagram += '\n';
+                        } else if (char === 't' && escapeNext) {
+                          extractedDiagram += '\t';
+                        } else if (char === '"' && escapeNext) {
+                          extractedDiagram += '"';
+                        } else if (char === '\\' && escapeNext) {
+                          extractedDiagram += '\\';
+                        } else {
+                          extractedDiagram += char;
+                        }
+                        escapeNext = false;
+                      }
+                      i++;
+                    }
+                    
+                    if (extractedDiagram) {
+                      diagram = extractedDiagram;
+                      statusEl.textContent = '完了！（エラーから復元）';
+                      debugEl.textContent += '抽出されたダイアグラム（先頭100文字）:\n' + 
+                        extractedDiagram.substring(0, 100) + '...';
+                      renderDiagram(diagram);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (error) {
+        statusEl.textContent = `エラー: ${error.message}`;
+        console.error('Fetch error:', error);
+        
+        // デバッグモードを表示
+        document.getElementById('debug').classList.remove('hidden');
+        debugEl.textContent = 'Fetch error: ' + error.message;
+      }
+    }
+    
+    function renderDiagram(code) {
+      const diagramEl = document.getElementById('diagram');
+      diagramEl.innerHTML = `<pre class="mermaid">${code}</pre>`;
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)file:///C:/docker_work/cline/gitdiagram/api_test.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>GitDiagram API Test</title>
+  <script src="./GitDiagram API Test_files/mermaid.min.js.ダウンロード"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    .form { margin-bottom: 20px; }
+    input, button { padding: 8px; margin: 5px 0; }
+    #diagram { border: 1px solid #ccc; padding: 10px; margin-top: 20px; }
+    pre { white-space: pre-wrap; }
+    .api-key-section { 
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .api-key-status {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .status-set {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-not-set {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .toggle-section {
+      cursor: pointer;
+      color: #0066cc;
+      margin-bottom: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>GitDiagram API Test</h1>
+  
+  <div class="form">
+    <input id="username" placeholder="GitHub ユーザー名">
+    <input id="repo" placeholder="リポジトリ名">
+    <input id="instructions" placeholder="任意の指示">
+    <button onclick="generateDiagram()">ダイアグラム生成</button>
+  </div>
+  
+  <div class="toggle-section" onclick="toggleApiKeySection()">
+    <span id="toggle-text">▶ OpenAI APIキー設定（大きなリポジトリ用）</span>
+  </div>
+  
+  <div id="api-key-section" class="api-key-section hidden">
+    <h3>OpenAI APIキー設定</h3>
+    <p>大きなリポジトリ（50,000トークン以上）を分析するには、自分のOpenAI APIキーが必要です。</p>
+    <div class="form">
+      <input id="api-key" type="password" placeholder="OpenAI APIキー">
+      <button onclick="saveApiKey()">APIキーを保存</button>
+      <span id="api-key-status" class="api-key-status status-set">設定済み</span>
+    </div>
+    <p><small>※APIキーはブラウザのローカルストレージに保存され、サーバーには送信時のみ使用されます。</small></p>
+  </div>
+  
+  <div id="status">完了！</div>
+  <div id="explanation">&lt;explanation&gt;
+This project is the AWS CLI version 1 – a monolithic command line application that provides a unified interface for interacting with the many Amazon Web Services. Its main purpose is to translate a single “aws” command (with subcommands and options) into the appropriate API calls for AWS services (S3, EC2, CloudFormation, etc.). The file tree shows a highly modularized codebase with directories for core functionality (such as awscli/clidriver.py, awscli/argparser.py, and awscli/utils.py), a large “customizations” section that contains service‐specific extensions (for EC2, CloudFormation, etc.), as well as extensive tests and documentation directories. 
+
+To create an accurate system design diagram for this project, you should break the system into several key components and layers. Consider the following guidelines:
+
+1. Identify the Main Components:
+   • Entry Point and CLI Interface – the “bin/aws” (and its Windows variant) acts as the starting point. It loads the primary “awscli” module and dispatches user input.
+   • Command Engine – the core “cli driver” (e.g., awscli/clidriver.py) handles argument parsing (with support from modules such as awscli/argparser.py and awscli/shorthand.py) and maps commands to functions.
+   • Service Command Modules – these are the subcomponents where each AWS service (like S3, EC2, CloudFormation, etc.) is implemented as a set of commands. They are organized under “awscli/commands.py” and extended via the “awscli/customizations” folder.
+   • Customizations/Plugins – additional service-specific tweaks (from awscli/customizations) that modify commands, enhance arguments, or format output uniquely for certain AWS services.
+   • Configuration and Credential Management – components that read from configuration files, shared credentials, environment variables, and possibly IAM roles. These parts configure defaults (like region or output format) and are integrated in modules like awscli/arguments.py and the CLI’s utility methods.
+   • Output and Help System – modules located in awscli/help.py, awscli/table.py, awscli/text.py, and topics in “awscli/topics” are responsible for rendering help messages and formatting outputs.
+   • Testing and Documentation – although not part of the core runtime, the wide “tests” and “doc” directories illustrate a comprehensive test suite and documentation generation system that is important for ongoing architecture evolution.
+
+2. Determine Relationships and Layering:
+   • The diagram should show a layered architecture in which the CLI user input (via the shell executable “bin/aws”) flows upward to the Command Engine.
+   • The Command Engine contacts the Service Command Modules, which in turn invoke the AWS service clients (built over underlying libraries, such as botocore).
+   • Customization Modules “plug in” their extensions into the service command flow to override validation, argument renaming, response postprocessing, etc.
+   • Configuration and Credential Management form a support layer that is engaged early during initialization.
+   • The Output/Help system is called last to format responses back to the user.
+   • Tests and documentation are not in the runtime flow but serve to validate and illustrate the system’s behavior.
+
+3. Highlight Architecture and Design Patterns:
+   • A plugin or customization pattern is evident: the “customizations” directory contains many service-specific enhancements, suggesting a design that supports extension by adding new modules without changing the core.
+   • The use of modular directories such as “awscli”, “awscli/customizations”, and “tests” emphasizes separation of concerns.
+   • The system design shows a command dispatch mechanism (likely using a form of the Command design pattern) to process different command trees.
+   • The layering—with a clear separation between CLI input parsing, core command dispatch, service command implementation, and output formatting—should be emphasized.
+
+4. Include Technologies and Dependencies:
+   • Python is the runtime, and dependency management is carried out via pip and setuptools as seen in files like “setup.py” and “pyproject.toml”.
+   • A large number of tests indicate an emphasis on quality assurance and continuous integration (via GitHub workflows in “.github/workflows” and CI scripts in “scripts/ci”).
+
+5. Diagramming Guidelines Tailored to This Project:
+   • Use a block diagram where each major component is represented by a labeled box. For example, one box for “User Interface/Entry Point (bin/aws)”, one for “Command Engine (CLIDriver)”, another for “Service Command Modules”, etc.
+   • Draw directional arrows to show the flow from the CLI input through parsing, dispatch, customization, to the final API call execution and output formatting.
+   • Apply color-coding or use distinct shapes (e.g., rounded rectangles for plugins, cylinders for configuration/databases, and parallelograms for input/output) to differentiate categories.
+   • Annotate how customization modules override or extend functionalities within service commands.
+   • It might be useful to include the configuration management layer (possibly interacting with file I/O for AWS credentials and config files) to illustrate how runtime configuration is managed.
+   • Optionally include side components for automated testing, CI/CD pipelines (given the extensive .github and scripts directories), and documentation generation.
+
+6. Additional Practical Considerations:
+   • Ensure that every major function (e.g., entry point, command engine, customization loader, and service client integration) is labeled clearly.
+   • Consider using different colors or shapes for core libraries (in awscli/) versus extension or customization modules.
+   • You might want to briefly indicate the testing framework and the documentation build process in a side box to show overall project health and development workflow.
+
+By following these steps and including these elements in your system design diagram, you will clearly represent the architecture of the AWS CLI version 1 – its modular design, the flow of user input through the command engine into service-specific subcommands (enhanced by customizations), and finally the output and interactions with AWS services. This detailed diagram will be very useful for gaining insights into system-wide dependencies and the overall command processing flow.
+&lt;/explanation&gt;</div>
+  <div id="diagram"><pre class="mermaid" data-processed="true"><svg aria-roledescription="flowchart-v2" role="graphics-document document" viewBox="0 0 621.20703125 969" style="max-width: 621.20703125px;" class="flowchart" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="100%" id="mermaid-1743249211718"><style>#mermaid-1743249211718{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1743249211718 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1743249211718 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1743249211718 .error-icon{fill:#552222;}#mermaid-1743249211718 .error-text{fill:#552222;stroke:#552222;}#mermaid-1743249211718 .edge-thickness-normal{stroke-width:1px;}#mermaid-1743249211718 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1743249211718 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1743249211718 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1743249211718 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1743249211718 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1743249211718 .marker{fill:#333333;stroke:#333333;}#mermaid-1743249211718 .marker.cross{stroke:#333333;}#mermaid-1743249211718 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1743249211718 p{margin:0;}#mermaid-1743249211718 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-1743249211718 .cluster-label text{fill:#333;}#mermaid-1743249211718 .cluster-label span{color:#333;}#mermaid-1743249211718 .cluster-label span p{background-color:transparent;}#mermaid-1743249211718 .label text,#mermaid-1743249211718 span{fill:#333;color:#333;}#mermaid-1743249211718 .node rect,#mermaid-1743249211718 .node circle,#mermaid-1743249211718 .node ellipse,#mermaid-1743249211718 .node polygon,#mermaid-1743249211718 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1743249211718 .rough-node .label text,#mermaid-1743249211718 .node .label text,#mermaid-1743249211718 .image-shape .label,#mermaid-1743249211718 .icon-shape .label{text-anchor:middle;}#mermaid-1743249211718 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1743249211718 .rough-node .label,#mermaid-1743249211718 .node .label,#mermaid-1743249211718 .image-shape .label,#mermaid-1743249211718 .icon-shape .label{text-align:center;}#mermaid-1743249211718 .node.clickable{cursor:pointer;}#mermaid-1743249211718 .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#mermaid-1743249211718 .arrowheadPath{fill:#333333;}#mermaid-1743249211718 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-1743249211718 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1743249211718 .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-1743249211718 .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#mermaid-1743249211718 .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-1743249211718 .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#mermaid-1743249211718 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1743249211718 .cluster text{fill:#333;}#mermaid-1743249211718 .cluster span{color:#333;}#mermaid-1743249211718 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1743249211718 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-1743249211718 rect.text{fill:none;stroke-width:0;}#mermaid-1743249211718 .icon-shape,#mermaid-1743249211718 .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-1743249211718 .icon-shape p,#mermaid-1743249211718 .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#mermaid-1743249211718 .icon-shape rect,#mermaid-1743249211718 .image-shape rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-1743249211718 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-1743249211718 .cli&gt;*{fill:#ADD8E6!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .cli span{fill:#ADD8E6!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .config&gt;*{fill:#98FB98!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .config span{fill:#98FB98!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .engine&gt;*{fill:#FFD700!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .engine span{fill:#FFD700!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .service&gt;*{fill:#FFA07A!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .service span{fill:#FFA07A!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .plugin&gt;*{fill:#FFB6C1!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .plugin span{fill:#FFB6C1!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .output&gt;*{fill:#D3D3D3!important;stroke:#000!important;stroke-width:1px!important;}#mermaid-1743249211718 .output span{fill:#D3D3D3!important;stroke:#000!important;stroke-width:1px!important;}</style><g><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mermaid-1743249211718_flowchart-v2-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="4.5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mermaid-1743249211718_flowchart-v2-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="11" viewBox="0 0 10 10" class="marker flowchart-v2" id="mermaid-1743249211718_flowchart-v2-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="-1" viewBox="0 0 10 10" class="marker flowchart-v2" id="mermaid-1743249211718_flowchart-v2-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="12" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mermaid-1743249211718_flowchart-v2-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="-1" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mermaid-1743249211718_flowchart-v2-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"><g data-look="classic" id="subGraph5" class="cluster"><rect height="104" width="485.046875" y="857" x="93.09765625" style=""></rect><g transform="translate(256.18359375, 857)" class="cluster-label"><foreignobject height="24" width="158.875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Output &amp; Help System</p></span></div></foreignobject></g></g><g data-look="classic" id="Customizations/Plugins" class="cluster"><rect height="104" width="208.28125" y="549" x="404.92578125" style=""></rect><g transform="translate(425.63671875, 549)" class="cluster-label"><foreignobject height="24" width="166.859375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Customizations/Plugins</p></span></div></foreignobject></g></g><g data-look="classic" id="subGraph3" class="cluster"><rect height="104" width="475.1328125" y="703" x="94.9140625" style=""></rect><g transform="translate(237.66796875, 703)" class="cluster-label"><foreignobject height="24" width="189.625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Service Command Modules</p></span></div></foreignobject></g></g><g data-look="classic" id="subGraph2" class="cluster"><rect height="337" width="324.4140625" y="316" x="60.51171875" style=""></rect><g transform="translate(161.2265625, 316)" class="cluster-label"><foreignobject height="24" width="122.984375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Command Engine</p></span></div></foreignobject></g></g><g data-look="classic" id="subGraph1" class="cluster"><rect height="104" width="418.1171875" y="162" x="8" style=""></rect><g transform="translate(117.05859375, 162)" class="cluster-label"><foreignobject height="48" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Configuration &amp; Credential Management</p></span></div></foreignobject></g></g><g data-look="classic" id="subGraph0" class="cluster"><rect height="104" width="396.4375" y="8" x="38.5" style=""></rect><g transform="translate(197.21875, 8)" class="cluster-label"><foreignobject height="24" width="79"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Entry Point</p></span></div></foreignobject></g></g></g><g class="edgePaths"><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_E1_C1_0" d="M119.302,87L117.094,91.167C114.886,95.333,110.471,103.667,108.263,112C106.055,120.333,106.055,128.667,106.055,137C106.055,145.333,106.055,153.667,107.248,161.368C108.441,169.07,110.828,176.14,112.022,179.675L113.215,183.21"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_E2_C1_0" d="M267.771,87L259.429,91.167C251.087,95.333,234.403,103.667,226.061,112C217.719,120.333,217.719,128.667,217.719,137C217.719,145.333,217.719,153.667,210.761,161.678C203.804,169.688,189.89,177.377,182.932,181.221L175.975,185.065"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_E1_C2_0" d="M187.666,87L196.008,91.167C204.35,95.333,221.035,103.667,229.377,112C237.719,120.333,237.719,128.667,237.719,137C237.719,145.333,237.719,153.667,244.676,161.678C251.633,169.688,265.548,177.377,272.505,181.221L279.463,185.065"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_E2_C2_0" d="M346.001,87L349.731,91.167C353.461,95.333,360.922,103.667,364.652,112C368.383,120.333,368.383,128.667,368.383,137C368.383,145.333,368.383,153.667,365.837,161.455C363.291,169.243,358.2,176.485,355.654,180.106L353.109,183.728"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_C1_CE1_0" d="M123.609,241L123.609,245.167C123.609,249.333,123.609,257.667,123.609,266C123.609,274.333,123.609,282.667,123.609,291C123.609,299.333,123.609,307.667,129.973,315.657C136.337,323.647,149.064,331.293,155.428,335.117L161.792,338.94"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_C2_CE1_0" d="M331.828,241L331.828,245.167C331.828,249.333,331.828,257.667,331.828,266C331.828,274.333,331.828,282.667,331.828,291C331.828,299.333,331.828,307.667,320.121,316.837C308.415,326.007,285.002,336.013,273.295,341.017L261.588,346.02"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_CE1_CE2_0" d="M210.16,395L210.16,399.167C210.16,403.333,210.16,411.667,210.16,419.333C210.16,427,210.16,434,210.16,437.5L210.16,441"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_CE2_CE3_0" d="M210.16,499L210.16,503.167C210.16,507.333,210.16,515.667,210.16,524C210.16,532.333,210.16,540.667,210.16,548.333C210.16,556,210.16,563,210.16,566.5L210.16,570"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_CE3_SC1_0" d="M210.16,628L210.16,632.167C210.16,636.333,210.16,644.667,210.16,653C210.16,661.333,210.16,669.667,210.16,678C210.16,686.333,210.16,694.667,217.989,702.705C225.819,710.742,241.477,718.485,249.307,722.356L257.136,726.227"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_CP1_SC1_0" d="M509.066,628L509.066,632.167C509.066,636.333,509.066,644.667,509.066,653C509.066,661.333,509.066,669.667,509.066,678C509.066,686.333,509.066,694.667,489.52,704.08C469.973,713.493,430.879,723.986,411.332,729.232L391.785,734.479"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_SC1_O1_0" d="M242.734,779.226L228.864,783.855C214.993,788.484,187.253,797.742,173.382,806.538C159.512,815.333,159.512,823.667,159.512,832C159.512,840.333,159.512,848.667,159.512,856.333C159.512,864,159.512,871,159.512,874.5L159.512,878"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_SC1_O2_0" d="M294.366,782L291.131,786.167C287.896,790.333,281.427,798.667,278.192,807C274.957,815.333,274.957,823.667,274.957,832C274.957,840.333,274.957,848.667,274.957,856.333C274.957,864,274.957,871,274.957,874.5L274.957,878"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_SC1_O3_0" d="M353.676,782L359.594,786.167C365.512,790.333,377.348,798.667,383.266,807C389.184,815.333,389.184,823.667,389.184,832C389.184,840.333,389.184,848.667,389.184,856.333C389.184,864,389.184,871,389.184,874.5L389.184,878"></path><path marker-end="url(#mermaid-1743249211718_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_SC1_O4_0" d="M387.922,774.771L407.645,780.142C427.368,785.514,466.815,796.257,486.538,805.795C506.262,815.333,506.262,823.667,506.262,832C506.262,840.333,506.262,848.667,506.262,856.333C506.262,864,506.262,871,506.262,874.5L506.262,878"></path></g><g class="edgeLabels"><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignobject></g></g></g><g class="nodes"><a transform="translate(133.609375, 60)" xlink:href="https://github.com/aws/aws-cli/tree/develop/bin/aws"><g id="flowchart-E1-0" class="node default cli clickable"><rect height="54" width="120.21875" y="-27" x="-60.109375" ry="5" rx="5" style="fill:#ADD8E6 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-45.109375, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="90.21875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>CLI: bin/aws</p></span></div></foreignobject></g></g></a><a transform="translate(321.828125, 60)" xlink:href="https://github.com/aws/aws-cli/blob/develop/bin/aws.cmd"><g id="flowchart-E2-1" class="node default cli clickable"><rect height="54" width="156.21875" y="-27" x="-78.109375" ry="5" rx="5" style="fill:#ADD8E6 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-63.109375, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="126.21875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>CLI: bin/aws.cmd</p></span></div></foreignobject></g></g></a><a transform="translate(123.609375, 214)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/arguments.py"><g id="flowchart-C1-2" class="node default config clickable"><rect height="54" width="161.21875" y="-27" x="-80.609375" ry="5" rx="5" style="fill:#98FB98 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-65.609375, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="131.21875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Config: Arguments</p></span></div></foreignobject></g></g></a><a transform="translate(331.828125, 214)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/utils.py"><g id="flowchart-C2-3" class="node default config clickable"><rect height="54" width="118.578125" y="-27" x="-59.2890625" ry="5" rx="5" style="fill:#98FB98 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-44.2890625, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="88.578125"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Config: Utils</p></span></div></foreignobject></g></g></a><a transform="translate(210.16015625, 368)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/clidriver.py"><g id="flowchart-CE1-4" class="node default engine clickable"><rect height="54" width="95.5" y="-27" x="-47.75" ry="5" rx="5" style="fill:#FFD700 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-32.75, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="65.5"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>CLIDriver</p></span></div></foreignobject></g></g></a><a transform="translate(210.16015625, 472)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/argparser.py"><g id="flowchart-CE2-5" class="node default engine clickable"><rect height="54" width="97.90625" y="-27" x="-48.953125" ry="5" rx="5" style="fill:#FFD700 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-33.953125, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="67.90625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>ArgParser</p></span></div></foreignobject></g></g></a><a transform="translate(210.16015625, 601)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/shorthand.py"><g id="flowchart-CE3-6" class="node default engine clickable"><rect height="54" width="102.390625" y="-27" x="-51.1953125" ry="5" rx="5" style="fill:#FFD700 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-36.1953125, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="72.390625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Shorthand</p></span></div></foreignobject></g></g></a><a transform="translate(315.328125, 755)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/commands.py"><g id="flowchart-SC1-7" class="node default service clickable"><rect height="54" width="145.1875" y="-27" x="-72.59375" ry="5" rx="5" style="fill:#FFA07A !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-57.59375, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="115.1875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Core Commands</p></span></div></foreignobject></g></g></a><a transform="translate(509.06640625, 601)" xlink:href="https://github.com/aws/aws-cli/tree/develop/awscli/customizations/"><g id="flowchart-CP1-8" class="node default plugin clickable"><rect height="54" width="138.28125" y="-27" x="-69.140625" ry="5" rx="5" style="fill:#FFB6C1 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-54.140625, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="108.28125"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Customizations</p></span></div></foreignobject></g></g></a><a transform="translate(159.51171875, 909)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/help.py"><g id="flowchart-O1-9" class="node default output clickable"><rect height="54" width="62.828125" y="-27" x="-31.4140625" ry="5" rx="5" style="fill:#D3D3D3 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-16.4140625, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="32.828125"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Help</p></span></div></foreignobject></g></g></a><a transform="translate(274.95703125, 909)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/table.py"><g id="flowchart-O2-10" class="node default output clickable"><rect height="54" width="68.0625" y="-27" x="-34.03125" ry="5" rx="5" style="fill:#D3D3D3 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-19.03125, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="38.0625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Table</p></span></div></foreignobject></g></g></a><a transform="translate(389.18359375, 909)" xlink:href="https://github.com/aws/aws-cli/blob/develop/awscli/text.py"><g id="flowchart-O3-11" class="node default output clickable"><rect height="54" width="60.390625" y="-27" x="-30.1953125" ry="5" rx="5" style="fill:#D3D3D3 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-15.1953125, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="30.390625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Text</p></span></div></foreignobject></g></g></a><a transform="translate(506.26171875, 909)" xlink:href="https://github.com/aws/aws-cli/tree/develop/awscli/topics/"><g id="flowchart-O4-12" class="node default output clickable"><rect height="54" width="73.765625" y="-27" x="-36.8828125" ry="5" rx="5" style="fill:#D3D3D3 !important;stroke:#000 !important;stroke-width:1px !important" class="basic label-container"></rect><g transform="translate(-21.8828125, -12)" style="" class="label"><rect></rect><foreignobject height="24" width="43.765625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Topics</p></span></div></foreignobject></g></g></a></g></g></g></svg></pre></div>
+  
+  <div id="debug" class="hidden">
+    <h3>デバッグ情報</h3>
+    <pre id="debug-content">ダイアグラムデータ受信中: flowchart TD
+    %% Entry Point and CLI Interface
+    subgraph "Entry Point"
+        E1("CLI: bin/aw...</pre>
+  </div>
+  
+  <script>
+    mermaid.initialize({ startOnLoad: false });
+    
+    // ページ読み込み時にAPIキーの状態を確認
+    document.addEventListener('DOMContentLoaded', function() {
+      checkApiKeyStatus();
+    });
+    
+    // APIキーセクションの表示/非表示を切り替える
+    function toggleApiKeySection() {
+      const section = document.getElementById('api-key-section');
+      const toggleText = document.getElementById('toggle-text');
+      
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        toggleText.textContent = '▼ OpenAI APIキー設定（大きなリポジトリ用）';
+      } else {
+        section.classList.add('hidden');
+        toggleText.textContent = '▶ OpenAI APIキー設定（大きなリポジトリ用）';
+      }
+    }
+    
+    // APIキーの状態を確認
+    function checkApiKeyStatus() {
+      const apiKey = localStorage.getItem('openai_key');
+      const statusEl = document.getElementById('api-key-status');
+      
+      if (apiKey) {
+        statusEl.textContent = '設定済み';
+        statusEl.className = 'api-key-status status-set';
+      } else {
+        statusEl.textContent = '未設定';
+        statusEl.className = 'api-key-status status-not-set';
+      }
+    }
+    
+    // APIキーを保存
+    function saveApiKey() {
+      const apiKey = document.getElementById('api-key').value;
+      
+      if (apiKey) {
+        localStorage.setItem('openai_key', apiKey);
+        document.getElementById('api-key').value = '';
+        alert('APIキーが保存されました');
+      } else {
+        alert('APIキーを入力してください');
+      }
+      
+      checkApiKeyStatus();
+    }
+    
+    async function generateDiagram() {
+      const username = document.getElementById('username').value;
+      const repo = document.getElementById('repo').value;
+      const instructions = document.getElementById('instructions').value;
+      const statusEl = document.getElementById('status');
+      const explanationEl = document.getElementById('explanation');
+      const diagramEl = document.getElementById('diagram');
+      const debugEl = document.getElementById('debug-content');
+      
+      // GitHubのURLからユーザー名とリポジトリ名を抽出
+      if (username.includes('github.com')) {
+        try {
+          const url = new URL(username);
+          const parts = url.pathname.split('/').filter(p => p);
+          if (parts.length >= 2) {
+            document.getElementById('username').value = parts[0];
+            document.getElementById('repo').value = parts[1];
+          }
+        } catch (e) {
+          console.error('Invalid URL:', e);
+        }
+      }
+      
+      const extractedUsername = document.getElementById('username').value;
+      const extractedRepo = document.getElementById('repo').value;
+      
+      if (!extractedUsername || !extractedRepo) {
+        statusEl.textContent = 'ユーザー名とリポジトリ名を入力してください';
+        return;
+      }
+      
+      statusEl.textContent = '生成中...';
+      explanationEl.textContent = '';
+      diagramEl.innerHTML = '';
+      debugEl.textContent = '';
+      
+      // APIキーを取得
+      const apiKey = localStorage.getItem('openai_key');
+      
+      try {
+        const requestBody = { 
+          username: extractedUsername, 
+          repo: extractedRepo, 
+          instructions: instructions 
+        };
+        
+        // APIキーが設定されている場合は追加
+        if (apiKey) {
+          requestBody.api_key = apiKey;
+        }
+        
+        const response = await fetch('http://localhost:8000/generate/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        let diagram = '';
+        let explanation = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = new TextDecoder().decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                console.log('Received data:', data);
+                
+                if (data.error) {
+                  statusEl.textContent = `エラー: ${data.error}`;
+                  
+                  // トークン制限エラーの場合、APIキーセクションを表示
+                  if (data.error.includes('token limit') || data.error.includes('API key')) {
+                    document.getElementById('api-key-section').classList.remove('hidden');
+                    document.getElementById('toggle-text').textContent = '▼ OpenAI APIキー設定（大きなリポジトリ用）';
+                  }
+                  
+                  return;
+                }
+                
+                if (data.status === 'diagram_chunk' && data.chunk) {
+                  diagram += data.chunk;
+                  statusEl.textContent = 'ダイアグラム生成中...';
+                  
+                  // デバッグ情報を表示
+                  debugEl.textContent = 'ダイアグラムデータ受信中: ' + 
+                    diagram.substring(0, 100) + '...';
+                }
+                
+                if (data.status === 'explanation_chunk' && data.chunk) {
+                  explanation += data.chunk;
+                  explanationEl.textContent = explanation;
+                }
+                
+                if (data.status === 'complete') {
+                  statusEl.textContent = '完了！';
+                  diagram = data.diagram || diagram;
+                  explanation = data.explanation || explanation;
+                  explanationEl.textContent = explanation;
+                  renderDiagram(diagram);
+                }
+              } catch (e) {
+                console.error('Error parsing SSE message:', e, line);
+                debugEl.textContent += '\nエラー: ' + e.message;
+              }
+            }
+          }
+        }
+      } catch (error) {
+        statusEl.textContent = `エラー: ${error.message}`;
+        console.error('Fetch error:', error);
+        
+        // デバッグモードを表示
+        document.getElementById('debug').classList.remove('hidden');
+        debugEl.textContent = 'Fetch error: ' + error.message;
+      }
+    }
+    
+    function renderDiagram(code) {
+      const diagramEl = document.getElementById('diagram');
+      diagramEl.innerHTML = `<pre class="mermaid">${code}</pre>`;
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    }
+  </script>
+
+
+<div class="mermaidTooltip" style="opacity: 0;"></div></body></html>
